@@ -98,6 +98,7 @@ enum background_attribute {
     mCoBG_ATTRIBUTE_62,
     mCoBG_ATTRIBUTE_63,
     // ...
+    mCoBG_ATTRIBUTE_NUM,
 
     mCoBG_ATTRIBUTE_NONE = 100
 };
@@ -291,7 +292,6 @@ extern int mCoBG_CheckWaterAttribute_OutOfSea(u32 attribute);
 extern int mCoBG_CheckHole_OrgAttr(u32 attribute);
 extern f32 mCoBG_GetBgY_OnlyCenter_FromWpos(xyz_t wpos, f32 dist);
 extern f32 mCoBG_GetBgY_OnlyCenter_FromWpos2(xyz_t wpos, f32 foot_dist);
-extern int mCoBG_Attribute2CheckPlant(u32 attribute, const xyz_t* wpos);
 extern void mCoBG_BgCheckControll(xyz_t* reverse_pos, ACTOR* actor, f32 check_range, f32 offset_y, s16 wall_attr_check,
                                   s16 no_reverse, s16 check_type);
 extern int mCoBG_Height2GetLayer(f32 height);

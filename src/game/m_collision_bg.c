@@ -15,6 +15,73 @@ static xyz_t mCoBG_unit_offset[mCoBG_DIRECT_NUM] = {
   {  mFI_UNIT_BASE_SIZE_F, 0.0f, -mFI_UNIT_BASE_SIZE_F }
 };
 
+static u8 l_attribute_action_info[mCoBG_ATTRIBUTE_NUM] = {
+    0x1C, // grass0
+    0x1A, // grass1
+    0x18, // grass2
+    0x1F, // grass3
+    0x1C, // soil0
+    0x1A, // soil1
+    0x18, // soil2
+    0x1F, // stone
+    0x1F, // floor
+    0x1F, // bush
+    0x18, // hole
+    mCoBG_PLANT0, // wave
+    mCoBG_KILL_PLANT, // water
+    mCoBG_KILL_PLANT, // waterfall
+    mCoBG_KILL_PLANT, // river_n
+    mCoBG_KILL_PLANT, // river_nw
+    mCoBG_KILL_PLANT, // river_w
+    mCoBG_KILL_PLANT, // river_sw
+    mCoBG_KILL_PLANT, // river_s
+    mCoBG_KILL_PLANT, // river_se
+    mCoBG_KILL_PLANT, // river_e
+    mCoBG_KILL_PLANT, // river_ne
+    0x1F, // sand
+    0x1F, // wood
+    mCoBG_KILL_PLANT, // sea
+    0x08,
+    0x08,
+    mCoBG_KILL_PLANT,
+    mCoBG_KILL_PLANT,
+    mCoBG_KILL_PLANT,
+    mCoBG_KILL_PLANT,
+    0x1F,
+    0x1F,
+    0x1F,
+    0x1F,
+    0x1F,
+	0x08,
+    mCoBG_PLANT0,
+    mCoBG_PLANT0,
+    mCoBG_KILL_PLANT,
+	mCoBG_KILL_PLANT,
+    mCoBG_KILL_PLANT,
+    mCoBG_KILL_PLANT,
+    0x18,
+	0x18,
+    0x18,
+    0x18,
+    0x1F,
+	0x1F,
+    0x1F,
+    0x1F,
+    0x1F,
+	0x1F,
+    0x1F,
+    0x1F,
+    mCoBG_KILL_PLANT,
+	mCoBG_KILL_PLANT,
+    mCoBG_KILL_PLANT,
+    mCoBG_KILL_PLANT,
+    0x18,
+	0x18,
+    0x18,
+    0x17,
+    0x18,
+};
+
 static void mCoBG_PlussDirectOffset(xyz_t* ofs_wpos, xyz_t wpos, int direct) {
   
   if (ofs_wpos != NULL && direct >= 0 && direct < mCoBG_DIRECT_NUM) {
@@ -403,4 +470,33 @@ static u32 mCoBG_SearchAttribute(xyz_t wpos, int direct, s8* can_dig) {
   wpos.y = 0.0f;
   mCoBG_PlussDirectOffset(&next_ut, wpos, direct);
   return mCoBG_Wpos2Attribute(next_ut, can_dig);
+}
+
+int mCoBG_Attribute2CheckPlant(u32 attribute, const xyz_t* wpos) {
+  uint field_info;
+  uint attribute_action;
+  mCoBG_Collision_u *space_above;
+  int res;
+  xyz_t t_pos;
+  
+  field_info = mFI_GetFieldId();
+  if (mFI_GET_TYPE(field_info) == mFI_FIELDTYPE_FG) {
+    attribute_action = l_attribute_action_info[attribute] & 7;
+    if (attribute == mCoBG_ATTRIBUTE_63) {
+      t_pos = *wpos;
+      t_pos.z += mFI_UNIT_BASE_SIZE_F;
+      space_above = mFI_GetUnitCol(t_pos);
+      res = mCoBG_Attribute2CheckPlant(space_above->data.unit_attribute, &t_pos);
+    }
+    else {
+      res = -1;
+      if (attribute_action != mCoBG_KILL_PLANT) {
+        res = attribute_action;
+      }
+    }
+  }
+  else {
+    res = -1;
+  }
+  return res;
 }
