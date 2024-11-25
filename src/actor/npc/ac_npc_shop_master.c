@@ -269,30 +269,34 @@ void aNSC_get_sell_price(u32 amount) {
     mSP_get_sell_price(amount);
 }
 
-void aNSC_buy_item_single(int *p1, mActor_name_t item, int p2) {
-    static mActor_name_t unknown_arr[] = {ITM_MONEY_30000, EMPTY_NO};
-    Private_c *priv = Now_Private;
-    int *bells;
+int aNSC_buy_item_single(int *p1, mActor_name_t item, u16 p2) {
+    static mActor_name_t aNSC_exchange_itemNo[] = {ITM_MONEY_30000, EMPTY_NO};
+    u32 *bells;
     int idx;
-    int unknown;
-    int bells_before;
+    int replace_with_bag;
+    u32 bells_before;
+    Private_c *priv = Now_Private;
+    int res = 1;
 
     for (; p2 != 0; p2--) {
-        bells_before = *bells;
+        bells_before = *p1;
         if (bells_before >= 99999) {
             *p1 -= 30000;
-            unknown = 0;
+            replace_with_bag = 0;
+            res = 0;
         } else {
-            unknown = 1;
+            replace_with_bag = 1;
         }
         idx = mPr_GetPossessionItemIdxWithCond(priv, item, mPr_ITEM_COND_NORMAL);
 
-        mPr_SetPossessionItem(priv, idx, unknown_arr[bells_before < 99999], mPr_ITEM_COND_NORMAL);
+        mPr_SetPossessionItem(Now_Private, idx, aNSC_exchange_itemNo[replace_with_bag], mPr_ITEM_COND_NORMAL);
     }
 
 
-    while (*bells >= 99998) {
+    while (*bells >= 99999) {
         *bells -= 30000;
-        mPr_SetFreePossessionItem(priv, ITM_MONEY_30000, mPr_ITEM_COND_NORMAL);
+        mPr_SetFreePossessionItem(Now_Private, ITM_MONEY_30000, mPr_ITEM_COND_NORMAL);
     }
+
+    return res;
 }
